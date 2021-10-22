@@ -1,0 +1,30 @@
+{% extends 'list.html'%}
+
+{% block columnas %}
+    <tr>
+    <th scope="col">No.</th>
+    <th scope="col">Nombre</th>
+    <th scope="col">Categoria</th>
+    <th scope="col">Foto</th>
+    <th scope="col">Precio</th>
+    <th scope="col">Opciones</th>
+    </tr>
+{% endblock %}
+
+{% block filas %}
+    {% for c in object_list %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.name }}</td>
+            <td>{{ c.cate }}</td>
+            <td> <img src="{{ c.get_image }}" class="img-fluid d-block mx-auto" style="width: 40px; height: 40px"> </td>
+            <td>{{ c.pvp }}</td>
+            <td>
+                <a href="{% url 'producto_update' c.id %}" class="btn btn-warning btn-xs"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'producto_delete' c.id %}" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+

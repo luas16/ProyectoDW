@@ -1,0 +1,32 @@
+{% extends 'list.html' %}
+
+{% block columnas %}
+
+    <tr>
+        <th scope="col">No.</th>
+        <th scope="col">Cliente</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">SubTotal</th>
+        <th scope="col">IVA</th>
+        <th scope="col">Total</th>
+        <th scope="col">Opciones</th>
+    </tr>
+{% endblock %}
+
+{% block filas %}
+    {% for c in object_list %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.cli }}</td>
+            <td>{{ c.date_joined }}</td>
+            <td>{{ c.subtotal }}</td>
+            <td>{{ c.iva }}</td>
+            <td>{{ c.total }}</td>
+
+            <td>
+                <button type="button" class="btn btn-warning btn-xs"><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}

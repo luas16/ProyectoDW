@@ -1,0 +1,62 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block principal %}
+
+    <link rel="stylesheet" href="/static/css/principal.css">
+    <link rel="stylesheet" href="{% static 'lib/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'lib/bootstrap-4.4.1-dist/js/jquery-3.4.1.slim.min.js' %}">
+    <link rel="stylesheet" href="{% static 'lib/bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js' %}">
+    <link rel="stylesheet" href="{% static 'lib/adminlte-3.1.0/plugins/fontawesome-free/css/fontawesome.min.css' %}">
+    <div class="container ">
+        <div class="card-deck">
+            <a class="card dropdown-item btn" style="width: 18rem;" href="/">
+                <img class="card-img-top" src="/static/img/logo.jpg" alt="">
+                <div class="card-body text-lg-center">
+                    <p class="card-text">Principal</p>
+                </div>
+            </a>
+            <a class="card dropdown-item btn" style="width: 18rem;" href="/proyectoDW/category/list/">
+                <img class="card-img-top" src="/static/img/categoria.jpg" alt="Card image cap">
+                <div class="card-body text-lg-center">
+                    <p class="card-text">Categorias</p>
+                </div>
+            </a>
+            <a class="card dropdown-item btn" style="width: 18rem;" href="/proyectoDW/clientes/list/">
+                <img class="card-img-top" src="/static/img/cliente.jpg" alt="Card image cap">
+                <div class="card-body text-lg-center">
+                    <p class="card-text">Clientes</p>
+                </div>
+            </a>
+
+        </div>
+        <br>
+
+        <div class="card-deck ">
+            <a class="card dropdown-item btn" style="width: 18rem;" href="/proyectoDW/ventas/list/">
+                <img class="card-img-top" src="/static/img/ventas.jpg" alt="Card image cap">
+                <div class="card-body text-lg-center">
+                    <p class="card-text">Ventas</p>
+                </div>
+            </a>
+            <a class="card dropdown-item btn " style="width: 18rem;" href="/proyectoDW/productos/list/">
+                <img class="card-img-top" src="/static/img/productos.jpg" alt="Card image cap">
+                <div class="card-body text-lg-center">
+                    <p class="card-text">Productos</p>
+                </div>
+            </a>
+            <a class="card dropdown-item btn " style="width: 18rem;" href="/login/logout/">
+                <img class="card-img-top" src="/static/img/exit.jpg" alt="Card image cap">
+                <div class="card-body text-lg-center">
+                    <p class="card-text">Salir</p>
+                </div>
+            </a>
+
+        </div>
+    </div>
+    </div>
+    </div>
+
+
+
+{% endblock %}

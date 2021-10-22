@@ -1,0 +1,86 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ title }} Multiservicios Luas</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-3.1.0/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-3.1.0/css/adminlte.min.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <!-- Sweet alert -->
+    <script src="{% static 'lib/sweetalert2-9.10.0/sweetalert2.all.min.js' %}"></script>
+
+</head>
+<body class="hold-transition login-page" style="background: #05021F url('/ModeloB/homepage/static/img/bg.jpg') top right no-repeat" >
+<div class="login-box" >
+    <div class="login-logo" >
+        <a href="{% url 'index' %}" style="color: #1bff7e" ><b>Multiservicios</b>LUAS</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="card" >
+        <div class="card-body login-card-body" style="background: #7adeee">
+            <p class="login-box-msg">Regístrese para iniciar su sesión</p>
+            <form action="." method="post">
+                <input type="hidden" name="next" value="{{ next }}">
+                {%  csrf_token %}
+                <div class="input-group mb-3">
+                    {{ form.username | add_class:'form-control' | attr:'autocomple:off' |attr:'placeholder:Correo'}}
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.password | add_class:'form-control' | attr:'autocomple:off' |attr:'placeholder:Contraseña'}}
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                       <button type="submit" class="btn btn-primary btn-block" ><i class="fas fa-sign-in-alt"></i> Ingresar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+    <script type="application/javascript">
+        {% if form.errors %}
+            var errors = '';
+            {% for field in form %}
+                {% for error in field.errors %}
+                    errors += '{{ error }}\n';
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                errors += '{{ error }}\n';
+            {% endfor %}
+            swal.fire({
+                title: 'Error!',
+                text: errors,
+                icon: 'error'
+            });
+        {% endif %}
+    </script>
+</div>
+<!-- jQuery -->
+<script src="{% static 'lib/adminlte-3.1.0/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static 'lib/adminlte-3.1.0/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- AdminLTE App -->
+<script src="{% static 'lib/adminlte-3.1.0/js/adminlte.min.js' %}"></script>
+</body>
+</html>
