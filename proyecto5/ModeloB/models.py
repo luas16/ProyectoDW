@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime
 
+from django.forms import model_to_dict
+
 from ModeloB.choices import gender_choices
 from config.settings import MEDIA_URL, STATIC_URL
 
@@ -11,6 +13,10 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
 
     class Meta:
         verbose_name = 'Categoria'
@@ -27,6 +33,13 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['cate'] = self.cate.toJSON()
+        item['image'] = self.get_image()
+        item['pvp'] = format(self.pvp, '2f')
+        return item
+
     def get_image(self):
         if self.image:
             return '{}{}'.format(MEDIA_URL, self.image)
@@ -42,12 +55,18 @@ class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
     surnames = models.CharField(max_length=150, verbose_name='Apellidos')
     dpi = models.CharField(max_length=10, unique=True, verbose_name='DPI')
-    birthday = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
+    date_birthday= models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
-    sexo = models.CharField(max_length=10, choices=gender_choices, default='male', verbose_name='Sexo')
+    gender = models.CharField(max_length=10, choices=gender_choices, default='male', verbose_name='Sexo')
 
     def __str__(self):
         return self.names
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['gender'] = {'id': self.gender, 'name': self.get_gender_display()}
+        item['date_birthday'] = self.date_birthday.strftime('%Y-%m-%d')
+        return item
 
     class Meta:
         verbose_name = 'Cliente'
@@ -65,6 +84,16 @@ class Sale(models.Model):
     def __str__(self):
         return self.cli.names
 
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['cli'] = self.cli.toJSON()
+        item['subtotal'] = format(self.subtotal, '.2f')
+        item['iva'] = format(self.iva, '.2f')
+        item['total'] = format(self.total, '.2f')
+        item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
+        item['det'] = [i.toJSON() for i in self.detsale_set.all()]
+        return item
+
     class Meta:
         verbose_name = 'Venta'
         verbose_name_plural = 'Ventas'
@@ -80,6 +109,13 @@ class DetSale(models.Model):
 
     def __str__(self):
         return self.prod.name
+
+    def toJSON(self):
+        item = model_to_dict(self, exclude=['sale'])
+        item['prod'] = self.prod.toJSON()
+        item['price'] = format(self.price, '.2f')
+        item['subtotal'] = format(self.subtotal, '.2f')
+        return item
 
     class Meta:
         verbose_name = 'Detalle de Venta'

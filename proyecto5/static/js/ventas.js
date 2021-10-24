@@ -1,3 +1,4 @@
+var tblProducts;
 var vents = {
     items: {
         cli: '',
@@ -7,12 +8,32 @@ var vents = {
         total: 0.00,
         products: []
     },
-    add: function(item){
+    calculate_invoice: function () {
+        var subtotal = 0.00;
+
+        var total = 0.00;
+        $.each(this.items.products, function (pos, dict) {
+            dict.subtotal = dict.cant * parseFloat(dict.pvp);
+            subtotal += dict.subtotal;
+        });
+        this.items.subtotal = subtotal / 1.12;
+        this.items.iva = this.items.subtotal * 0.12;
+        total = this.items.subtotal + this.items.iva;
+        var descuento = (($('input[name="descuento"]').val()) / 100) * total;
+        this.items.total = total - (descuento);
+
+        $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
+        $('input[name="iva"]').val(this.items.iva.toFixed(2));
+        $('input[name="total"]').val(this.items.total.toFixed(2));
+        $('input[name="totalDesc"]').val(descuento.toFixed(2));
+    },
+    add: function (item) {
         this.items.products.push(item);
         this.list();
     },
     list: function () {
-        $('#tblProducts').DataTable({
+        this.calculate_invoice();
+        tblProducts = $('#tblProducts').DataTable({
             responsive: true,
             autoWidth: false,
             destroy: true,
@@ -20,7 +41,7 @@ var vents = {
             columns: [
                 {"data": "id"},
                 {"data": "name"},
-                {"data": "cat.name"},
+                {"data": "cate.name"},
                 {"data": "pvp"},
                 {"data": "cant"},
                 {"data": "subtotal"},
@@ -39,7 +60,7 @@ var vents = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
+                        return 'Q.' + parseFloat(data).toFixed(2);
                     }
                 },
                 {
@@ -47,7 +68,7 @@ var vents = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<input type="text" name="cant" class="form-control form-control-sm" autocomplete="off" value="'+row.cant+'">';
+                        return '<input type="text" name="cant" class="form-control form-control-sm input-sm" autocomplete="off" value="' + row.cant + '">';
                     }
                 },
                 {
@@ -55,10 +76,17 @@ var vents = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
+                        return 'Q.' + parseFloat(data).toFixed(2);
                     }
                 },
             ],
+            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
+                $(row).find('input[name="cant"]').TouchSpin({
+                    min: 1,
+                    max: 1000000000,
+                    step: 1
+                });
+            },
             initComplete: function (settings, json) {
 
             }
@@ -78,19 +106,20 @@ $(function () {
         locale: 'es',
         //minDate: moment().format("YYYY-MM-DD")
     });
-
-    $("input[name='iva']").TouchSpin({
+    //funcion para descuentos
+    $("input[name='descuento']").TouchSpin({
         min: 0,
         max: 100,
-        step: 0.1,
+        step: 1,
         decimals: 2,
         boostat: 5,
         maxboostedstep: 10,
         postfix: '%'
+    }).on('change', function () {
+        vents.calculate_invoice();
     });
 
-    // search products
-
+    // buscar productos
     $('input[name="search"]').autocomplete({
         source: function (request, response) {
             $.ajax({
@@ -113,7 +142,6 @@ $(function () {
         minLength: 1,
         select: function (event, ui) {
             event.preventDefault();
-            console.clear();
             ui.item.cant = 1;
             ui.item.subtotal = 0.00;
             console.log(vents.items);
@@ -121,4 +149,131 @@ $(function () {
             $(this).val('');
         }
     });
+
+    //eliminar todos los productos de la factura
+    $('.btnEliminarTodo').on('click', function () {
+        if (vents.items.products.length === 0) return false;
+        alerta_eliminacion('Notificación', '¿Esta seguro de eliminar todos los productos de la factura', function () {
+            vents.items.products = [];
+            vents.list();
+        })
+
+    });
+    //evento modificar cantidad
+    $('#tblProducts tbody')
+        //remover un producto de la factura
+        .on('click', 'a[rel="remove"]', function () {
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
+            alerta_eliminacion('Notificación', '¿Esta seguro de eliminar este producto de la factura', function () {
+                vents.items.products.splice(tr.wor, 1);
+                vents.list();
+            })
+
+        })
+        //cambiar la cantidad de un producto de la factura
+        .on('change keyup', 'input[name="cant"]', function () {
+            var cant = parseInt($(this).val());
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
+            vents.items.products[tr.row].cant = cant;
+            vents.calculate_invoice();
+            $('td:eq(5)', tblProducts.row(tr.row).node()).html('Q.' + vents.items.products[tr.row].subtotal.toFixed(2));
+        })
+
+    //Guardar los datos de la factura
+    $('form').on('submit', function (e) {
+        e.preventDefault();
+        if (vents.items.products.length === 0) {
+            message_error('Debe de ingresar un producto a la factura para generarla');
+            return false;
+        }
+        vents.items.date_joined = $('input[name="date_joined"]').val();
+        vents.items.cli = $('select[name="cli"]').val();
+        var parameter = new FormData();
+        parameter.append('action', $('input[name="action"]').val());
+        parameter.append('vents', JSON.stringify(vents.items));
+        $.confirm({
+            theme: 'material',
+            title: 'Confirmación',
+            icon: 'fa fa-info',
+            content: '¿Esta seguro de realizar la siguiente accion',
+            columnClass: 'medium',
+            typeAnimated: true,
+            cancelButtonClass: 'btn-primary',
+            draggable: true,
+            dragWindowBorder: false,
+            buttons: {
+                info: {
+                    text: "Si",
+                    btnClass: 'btn-primary',
+                    action: function () {
+                        $.ajax({
+                            url: window.location.pathname,
+                            type: 'POST',
+                            data: parameter,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                        }).done(function (data) {
+                            if (!data.hasOwnProperty('error')) {
+                                location.href = '/proyectoDW/ventas/list/';
+                                return false;
+                            }
+                            message_error(data.error);
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert(textStatus + ': ' + errorThrown);
+                        }).always(function (data) {
+                        });
+                    }
+                },
+                danger: {
+                    text: "No",
+                    btnClass: 'btn-red',
+                    action: function () {
+
+                    }
+                },
+            }
+        })
+    });
+
+    //limpiar el txt para busqueda
+    $('.btnLimpiar').on('click', function () {
+        $('input[name="search"]').val('').focus();
+    });
+
+    //muestra el listado de mi tabla en la factura
+    vents.list();
+
 });
+
+
+//alerta de eliminacion
+function alerta_eliminacion(title, content, callback) {
+    $.confirm({
+        theme: 'material',
+        title: title,
+        icon: 'fas fa-warning',
+        content: content,
+        columnClass: 'medium',
+        typeAnimated: true,
+        cancelButtonClass: 'btn-primary',
+        draggable: true,
+        dragWindowBorder: false,
+        buttons: {
+            info: {
+                text: "Si",
+                btnClass: 'btn-primary',
+                action: function () {
+                    callback();
+                }
+            },
+            danger: {
+                text: "No",
+                btnClass: 'btn-red',
+                action: function () {
+
+                }
+            },
+        }
+    })
+};

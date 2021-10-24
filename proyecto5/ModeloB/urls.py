@@ -30,5 +30,6 @@ urlpatterns = [
     #ventas
     path('ventas/list/', VentasListView.as_view(), name='ventas'),
     path('ventas/add/', VentasCreateView.as_view(), name='ventas_create'),
+    path('ventas/delete/<int:pk>/', VentasDeleteView.as_view(), name='ventas_delete'),
 
 ]

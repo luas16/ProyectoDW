@@ -97,9 +97,23 @@ class ClientesForm(ModelForm):
                     'placeholder': 'Ingrese un nombre',
                 }
             ),
-
-            'birthday': DateInput(format='%Y-%m-%d',
-                                     attrs={'value': datetime.now().strftime('%Y-%m-%d')}),
+            'date_birthday': DateInput(
+                format='%Y-%m-%d',
+                attrs={
+                    'value': datetime.now().strftime('%Y-%m-%d'),
+                    'autocomplete': 'off',
+                    'class': 'form-control datetimepicker-input',
+                    'id': 'date_birthday',
+                    'data-target': '#date_birthday',
+                    'data-toggle': 'datetimepicker'
+                }
+            ),
+            'address': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese su dirección',
+                }
+            ),
+            'gender': Select()
         }
 
     def save(self, commit=True):
@@ -140,6 +154,7 @@ class VentasForm(ModelForm):
                 }
             ),
             'iva': TextInput(attrs={
+                'readonly': True,
                 'class': 'form-control',
             }),
             'subtotal': TextInput(attrs={

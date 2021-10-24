@@ -1,1 +1,113 @@
-{% extends  'form.html' %}
+{% extends 'list.html' %}
+{% load static %}
+{% block content %}
+    <link href="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+
+    <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
+    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
+
+    <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <link href="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.css' %}" rel="stylesheet"/>
+
+    <link href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.js' %}"></script>
+    <script src="{% static 'js/clientes.js' %}"></script>
+
+    <form method="post" action="." enctype="multipart/form-data">
+        <div class="card card-default">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% if action == 'add' %}
+                        <i class="fas fa-plus"></i>
+                    {% else %}
+                        <i class="fas fa-edit"></i>
+                    {% endif %}
+
+                    {{ title }}
+                </h3>
+            </div>
+
+            <!-- /.card body -->
+            <div class="card-body">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="{{ action }}">
+                {% for field in form.visible_fields %}
+                    <div class="form-group">
+                        <label for="">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                {% endfor %}
+            </div>
+
+
+            {#  footer del card  #}
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-flat btnTest">
+                    <i class="fas fa-save"></i> Guardar registro
+                </button>
+                {% if action == 'add' or action == 'edit' %}
+                    <a href="{{ list_url }}" type="buton" class="btn btn-info btn-flat btnTest">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+    <script>
+
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            {#var parameter = $(this).serializeArray();#}
+            var parameter = new FormData(this);
+            $.confirm({
+                theme: 'material',
+                title: 'Confirmación',
+                icon: 'fa fa-info',
+                content: '¿Esta seguro de realizar la siguiente accion',
+                columnClass: 'medium',
+                typeAnimated: true,
+                cancelButtonClass: 'btn-primary',
+                draggable: true,
+                dragWindowBorder: false,
+                buttons: {
+                    info: {
+                        text: "Si",
+                        btnClass: 'btn-primary',
+                        action: function () {
+                            $.ajax({
+                                url: window.location.pathname,
+                                type: 'POST',
+                                data: parameter,
+                                dataType: 'json',
+                                processData: false,
+                                contentType: false,
+                            }).done(function (data) {
+                                if (!data.hasOwnProperty('error')) {
+                                    location.href = '{{ list_url }}';
+                                    return false;
+                                }
+                                message_error(data.error);
+                            }).fail(function (jqXHR, textStatus, errorThrown) {
+                                alert(textStatus + ': ' + errorThrown);
+                            }).always(function (data) {
+                            });
+                        }
+                    },
+                    danger: {
+                        text: "No",
+                        btnClass: 'btn-red',
+                        action: function () {
+
+                        }
+                    },
+                }
+            })
+        });
+
+    </script>
+
+{% endblock %}
