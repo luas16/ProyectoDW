@@ -5,6 +5,7 @@ from ModeloB.views.principal.views import *
 from ModeloB.views.product.views import *
 from ModeloB.views.ventas.views import *
 
+
 urlpatterns = [
     #path('category/index/', category_list),
     path('category/list/', CategoriaListView.as_view(), name='categoria'),
@@ -14,6 +15,7 @@ urlpatterns = [
     #principal
     path('principal/', PrincipalView.as_view(), name= 'home'),
     path('compras/', ComprasView.as_view(), name= 'compras'),
+    path('estadistica/', EstadisticaView.as_view(), name= 'estadistica'),
 
     #Clientes
     path('clientes/list/', ClientesListView.as_view(), name='clientes'),

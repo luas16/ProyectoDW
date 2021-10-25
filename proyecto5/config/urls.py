@@ -25,10 +25,9 @@ from django.conf.urls.static import  static
 urlpatterns = [
     path('', IndexView.as_view(), name = 'index'),
     path('login/', include('ModeloB.login.urls')),
-    path('report/', include('ModeloB.login.urls')),
     path('admin/', admin.site.urls),
     path('proyectoDW/', include('ModeloB.urls')),
-    # path('reports/', include('ModeloB.reports.urls')),
+    path('reports/', include('ModeloB.reports.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

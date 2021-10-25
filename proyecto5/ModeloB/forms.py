@@ -128,6 +128,27 @@ class ClientesForm(ModelForm):
             data['error'] = str(e)
         return data
 
+class TestForm(Form):
+    categories = ModelChoiceField(queryset=Category.objects.all(), widget=Select(attrs={
+        'class': 'form-control select2',
+        'style': 'width: 100%'
+    }))
+
+    products = ModelChoiceField(queryset=Product.objects.none(), widget=Select(attrs={
+        'class': 'form-control select2',
+        'style': 'width: 100%'
+    }))
+
+    # search = CharField(widget=TextInput(attrs={
+    #     'class': 'form-control',
+    #     'placeholder': 'Ingrese una descripción'
+    # }))
+
+    search = ModelChoiceField(queryset=Product.objects.none(), widget=Select(attrs={
+        'class': 'form-control select2',
+        'style': 'width: 100%'
+    }))
+
 
 class VentasForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -140,7 +161,6 @@ class VentasForm(ModelForm):
             'cli': Select(attrs={
                 'class': 'form-control select2',
                 'style': 'width: 100%',
-
             }),
             'date_joined': DateInput(
                 format='%Y-%m-%d',

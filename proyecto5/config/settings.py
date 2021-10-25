@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
-from pathlib import Path
+
 import config.db as db
 
 
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'ModeloB',
     'ModeloB.login',
     'ModeloB.homepage',
-    # 'ModeloB.reports',
+    'ModeloB.reports',
  ]
 
 MIDDLEWARE = [
@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'es-gt'
+LANGUAGE_CODE = 'es-ec'
 
 TIME_ZONE = 'UTC'
 

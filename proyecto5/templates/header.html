@@ -3,15 +3,9 @@
 <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
     <div class="container">
         <ul class="navbar-nav ">
-            <!--icono para editarr -->
-            <li class="nav-item ">
-                <a href="{% url 'home' %}" class="nav-link">
-                    <i class="fas fa-home"></i>
-                </a>
-            </li>
-            <br>
+
         </ul>
-        <a href="/proyectoDW/principal/" class="navbar-brand">
+        <a href="{% url 'home' %}" class="navbar-brand">
             <img src="{% static 'lib/adminlte-3.1.0/img/user8-128x128.jpg' %}" alt="AdminLTE Logo"
                  class="brand-image img-circle elevation-3"
                  style="opacity: .8">
@@ -25,25 +19,51 @@
 
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             <!-- Left navbar links -->
-            <ul class="navbar-nav  navbar-no-expand ml-auto">
+            <ul class="navbar-nav navbar-no-expand ml-5">
+                <li class="nav-item "><a href="/proyectoDW/principal/" class="nav-link"><i class="fas fa-home"></i>Home
+                </a></li>
                 <li class="nav-item dropdown ">
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                        class="nav-link dropdown-toggle">Menú</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li><a href="/proyectoDW/principal/" class="dropdown-item">Principal </a></li>
-                        <li><a href="/proyectoDW/category/list/" class="dropdown-item">Categorias </a></li>
-                        <li><a href="/proyectoDW/clientes/list/" class="dropdown-item">Clientes</a></li>
-                        <li><a href="/proyectoDW/ventas/list/" class="dropdown-item">Ventas</a></li>
-                        <li><a href="/proyectoDW/productos/list/" class="dropdown-item">Productos</a></li>
+                        <li><a href="{% url 'home' %}" class="dropdown-item">Home </a></li>
+                        <li><a href="{% url 'categoria' %}" class="dropdown-item">Categorias </a></li>
+                        <li><a href="{% url 'clientes' %}" class="dropdown-item">Clientes</a></li>
+                        <li><a href="{% url 'ventas' %}" class="dropdown-item">Ventas</a></li>
+                        <li><a href="{% url 'productos' %}" class="dropdown-item">Productos</a></li>
+                        <li><a href="{% url 'sale_report' %}" class="dropdown-item">Reporte de Ventas</a></li>
+                        <li><a href="{% url 'estadistica' %}" class="dropdown-item">Estadistica de Ventas</a></li>
+
                     </ul>
                 </li>
+
+
             </ul>
             <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
                 <!--icono para editarr -->
-                <li class="nav-item ">
-                    <a href="#" class="nav-link">
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link" data-toggle="dropdown" >
                         <i class="fas fa-users-cog"></i> {{ request.user.username }}
                     </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-header" style="font-size: 10px;">
+                        Sú último acceso fue {{ request.user.last_login }}
+                    </span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-edit mr-2"></i> Editar perfil
+                            <span class="float-right text-muted text-sm"></span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-lock mr-2"></i> Editar password
+                            <span class="float-right text-muted text-sm"></span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-footer">
+                            <p>Este sistema te permitira realizar diferentes actividades</p>
+                        </a>
+                    </div>
                 </li>
                 <!--icono para salir -->
                 <li class="nav-item ">

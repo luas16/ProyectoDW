@@ -77,7 +77,7 @@ class Client(models.Model):
 class Sale(models.Model):
     cli = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name='Cliente')
     date_joined = models.DateField(default=datetime.now, verbose_name='Fecha')
-    subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Sub Total')
+    subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Subtotal')
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='IVA')
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Total')
 
