@@ -10,9 +10,9 @@ var vents = {
     },
     calculate_invoice: function () {
         var subtotal = 0.00;
-
         var total = 0.00;
         $.each(this.items.products, function (pos, dict) {
+            dict.pos = pos;
             dict.subtotal = dict.cant * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
         });
@@ -94,10 +94,36 @@ var vents = {
     },
 };
 
+//funcion para mostrar los imagenes en select2
+function formatRepo(repo) {
+    //si esta iniciando y esta vacio solo mostrara un texto
+    if (repo.loading) {
+        return repo.text;
+    }
+//html para formar el listado de la busqueda por medio del select2
+    var option = $(
+        '<div class="wrapper container ">' +
+        '<div class="row">' +
+        '<div class="col-lg-1">' +
+        '<img src="' + repo.image + '" class="img-fluid img-thumbnail d-block mx-auto rounded">' +
+        '</div>' +
+        '<div class="col-lg-5 text-left shadow-sm">' +
+        '<p style="margin-bottom: 0;">' +
+        '<b>Nombre:</b>' + repo.name + '<br>' +
+        '<b>Categoria:</b>' + repo.cate.name + '<br>' +
+        '<b>Precio:</b><span class="badge badge-warning"> Q.' + repo.pvp + '</span>' +
+        '</p>' +
+        '</div>' +
+        '</div>' +
+        '</div>');
+
+    return option;
+}
+
 $(function () {
     $('.select2').select2({
         theme: "bootstrap4",
-        language: 'es'
+        language: 'es',
     });
 
     $('#date_joined').datetimepicker({
@@ -120,35 +146,34 @@ $(function () {
     });
 
     // buscar productos
-    $('input[name="search"]').autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: window.location.pathname,
-                type: 'POST',
-                data: {
-                    'action': 'search_products',
-                    'term': request.term
-                },
-                dataType: 'json',
-            }).done(function (data) {
-                response(data);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                //alert(textStatus + ': ' + errorThrown);
-            }).always(function (data) {
-
-            });
-        },
-        delay: 500,
-        minLength: 1,
-        select: function (event, ui) {
-            event.preventDefault();
-            ui.item.cant = 1;
-            ui.item.subtotal = 0.00;
-            console.log(vents.items);
-            vents.add(ui.item);
-            $(this).val('');
-        }
-    });
+    // $('input[name="search"]').autocomplete({
+    //     source: function (request, response) {
+    //         $.ajax({
+    //             url: window.location.pathname,
+    //             type: 'POST',
+    //             data: {
+    //                 'action': 'search_products',
+    //                 'term': request.term
+    //             },
+    //             dataType: 'json',
+    //         }).done(function (data) {
+    //             response(data);
+    //         }).fail(function (jqXHR, textStatus, errorThrown) {
+    //             //alert(textStatus + ': ' + errorThrown);
+    //         }).always(function (data) {
+    //
+    //         });
+    //     },
+    //     delay: 500,
+    //     minLength: 1,
+    //     select: function (event, ui) {
+    //         event.preventDefault();
+    //         ui.item.cant = 1;
+    //         ui.item.subtotal = 0.00;
+    //         vents.add(ui.item);
+    //         $(this).val('');
+    //     }
+    // });
 
     //eliminar todos los productos de la factura
     $('.btnEliminarTodo').on('click', function () {
@@ -156,9 +181,12 @@ $(function () {
         alerta_eliminacion('Notificación', '¿Esta seguro de eliminar todos los productos de la factura', function () {
             vents.items.products = [];
             vents.list();
-        })
+        }, function () {
+
+        });
 
     });
+
     //evento modificar cantidad
     $('#tblProducts tbody')
         //remover un producto de la factura
@@ -167,7 +195,9 @@ $(function () {
             alerta_eliminacion('Notificación', '¿Esta seguro de eliminar este producto de la factura', function () {
                 vents.items.products.splice(tr.wor, 1);
                 vents.list();
-            })
+            }, function () {
+
+            });
 
         })
         //cambiar la cantidad de un producto de la factura
@@ -215,7 +245,13 @@ $(function () {
                             contentType: false,
                         }).done(function (data) {
                             if (!data.hasOwnProperty('error')) {
-                                location.href = '/proyectoDW/ventas/list/';
+
+                                alerta_eliminacion('Notificacion', '¿Desea imprimir la boleta de venta?', function () {
+                                    window.open('/proyectoDW/ventas/factura/pdf/'+data.id+'/', '_blank');
+                                    location.href = '/proyectoDW/ventas/list/';
+                                }, function () {
+                                    location.href = '/proyectoDW/ventas/list/';
+                                });
                                 return false;
                             }
                             message_error(data.error);
@@ -237,18 +273,52 @@ $(function () {
     });
 
     //limpiar el txt para busqueda
-    $('.btnLimpiar').on('click', function () {
-        $('input[name="search"]').val('').focus();
-    });
+    // $('.btnLimpiar').on('click', function () {
+    //     $('input[name="search"]').val('').focus();
+    // });
 
     //muestra el listado de mi tabla en la factura
-    vents.list();
+    // vents.list();
+
+    //buscar producto por medio de select2
+    $('select[name="search"]').select2({
+        theme: "bootstrap4",
+        language: 'es',
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: window.location.pathname,
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'search_products'
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Ingrese una descripción',
+        minimumInputLength: 1,
+        //propiedad para mostrar la imagen
+        templateResult: formatRepo,
+    }).on('select2:select', function (e) {
+        var data = e.params.data;
+        data.cant = 1;
+        data.subtotal = 0.00;
+        vents.add(data);
+        $(this).val('').trigger('change.select2');
+    });
 
 });
 
 
 //alerta de eliminacion
-function alerta_eliminacion(title, content, callback) {
+function alerta_eliminacion(title, content, callback, cancel) {
     $.confirm({
         theme: 'material',
         title: title,
@@ -271,7 +341,7 @@ function alerta_eliminacion(title, content, callback) {
                 text: "No",
                 btnClass: 'btn-red',
                 action: function () {
-
+                    cancel()
                 }
             },
         }

@@ -1,10 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<style>
+    {#    estilos para la factura#}
+    .img-invoice {
+        width: 50px;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .head {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    #invoice thead tr th {
+        text-align: left;
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        padding-top: 4px;
+    }
+
+    #invoice thead tr {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #invoice tbody tr {
+        padding: 0;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+</style>
 <body>
-$END$
+
+<img src="{{ logo }}" class=" img-invoice">
+{# datos de la copania#}
+<p class="head">
+    {{ comp.name }}<br>
+    Nit: {{ comp.nit }}<br>
+    {{ comp.direccion }}
+</p>
+{#datos de la factura#}
+<p>
+    <b>FACTURA:</b> {{ sale.id }}<br>
+    <b>FECHA DE VENTA:</b> {{ sale.date_joined }}<br>
+    <b>CLIENTE:</b> {{ sale.cli.names|upper }} {{ sale.cli.surnames|upper }}<br>
+    <b>NIT:</b> {{ sale.cli.nit }}<br>
+</p>
+{#detalle de los productos de la factura#}
+<table id="invoice">
+    <thead>
+    <tr>
+        <th style="width: 40%;">PRODUCTO</th>
+        <th style="width: 25%;">CATEGORIA</th>
+        <th style="width: 15%;">CANT</th>
+        <th style="width: 15%;">P.UNITARIO</th>
+        <th style="width: 5%;">TOTAL</th>
+    </tr>
+    </thead>
+    <tbody>
+    {#ciclo for para enlistar todos los productos de la factura #}
+    {% for d in sale.detsale_set.all %}
+        <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
+            <td>{{ d.prod.name }}</td>
+            <td>{{ d.prod.cate.name }}</td>
+            <td class="">{{ d.cant }}</td>
+            <td class="">Q.{{ d.price }}</td>
+            <td style="text-align: right;">Q.{{ d.subtotal }}</td>
+        </tr>
+    {% endfor %}
+
+    {#Detalle final de la factura, subtotal, iva, Total#}
+    <tr style="border-top: 1px solid black; padding-top: 4px;">
+        <td colspan="4"><b>SUBTOTAL</b></td>
+        <td style="text-align: right"><em>Q.{{ sale.subtotal }}</em></td>
+    </tr>
+    <tr style="padding-top: 0px;">
+        <td colspan="4"><b>IVA 12%</b></td>
+        <td style="text-align: right"><em>Q.{{ sale.iva }}</em></td>
+    </tr>
+    <tr style="padding-top: 0px;">
+        <td colspan="4"><b>TOTAL A PAGAR</b></td>
+        <td style="text-align: right"><b>Q.{{ sale.total }}</b></td>
+    </tr>
+    </tbody>
+</table>
+{#parte final de la factura#}
+<table style="margin-top: 250px;">
+    <thead>
+    <tr>
+        <th>****GRACIAS POR SU COMPRA****</th>
+    </tr>
+    <tr>
+        <th>NOSE ACEPTAN CAMBIOS NI DEVOLUCIONES</th>
+    </tr>
+    </thead>
+</table>
 </body>
 </html>
