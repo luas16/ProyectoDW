@@ -1,6 +1,7 @@
 from datetime import datetime
 from random import randint
 
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, IntegerField
 from django.db.models.functions import Coalesce, Cast
 from django.http import JsonResponse
@@ -8,16 +9,18 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
+from ModeloB.mixins import ValidatePermissionRequiredMixin
 from ModeloB.models import Sale, Product, DetSale
 
 
 class PrincipalView(TemplateView):
     template_name = 'principal.html'
 
-    def get_context_data(self, **kwargs):
-        contex = super().get_context_data(**kwargs)
-        contex['panel'] = 'Panel de administrador'
-        return contex
+    @method_decorator(login_required)
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        request.user.get_group_session()
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ComprasView(TemplateView):
@@ -25,9 +28,11 @@ class ComprasView(TemplateView):
 
 
 # clase para las graficas
-class EstadisticaView(TemplateView):
+class EstadisticaView(ValidatePermissionRequiredMixin, TemplateView):
     template_name = 'estadistica.html'
+    permission_required = "view_detsale", "view_sale"
 
+    @method_decorator(login_required)
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -52,8 +57,8 @@ class EstadisticaView(TemplateView):
                     'data': self.get_graph_sales_products_year_month(),
                 }
             elif action == 'get_graph_online':
-                data = {'y': randint(1, 100)}
-                print(data)
+                # enviara los datos de las ventas en tiempo real
+                data = {'y': self.get_graph_sales_year_month()[9]}
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:

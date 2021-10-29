@@ -7,12 +7,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from ModeloB.forms import ProductForm
+from ModeloB.mixins import ValidatePermissionRequiredMixin
 from ModeloB.models import  Product
 
 
-class ProductosListView(ListView):
+class ProductosListView(ValidatePermissionRequiredMixin, ListView):
     model = Product
     template_name = 'productos/list.html'
+    permission_required = "view_product"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -34,13 +36,12 @@ class ProductosListView(ListView):
         context['create_url'] = reverse_lazy('producto_create')
         return context
 
-
-
-class ProductosCreateView(CreateView):
+class ProductosCreateView(ValidatePermissionRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'productos/create.html'
     success_url = reverse_lazy('productos')
+    permission_required = "add_product"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -69,11 +70,12 @@ class ProductosCreateView(CreateView):
         return context
 
 #Editar un registro
-class ProductosUpdateView(UpdateView):
+class ProductosUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'productos/create.html'
     success_url = reverse_lazy('productos')
+    permission_required = "change_product"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -103,10 +105,11 @@ class ProductosUpdateView(UpdateView):
         return context
 
 #Eliminar un registro
-class ProductosDeleteView(DeleteView):
+class ProductosDeleteView(ValidatePermissionRequiredMixin, DeleteView):
     model = Product
     template_name = 'productos/delete.html'
     success_url = reverse_lazy('productos')
+    permission_required = "delete_product"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)

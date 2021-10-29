@@ -1,7 +1,5 @@
 {%  extends 'home.html'%}
-
 {% block body %}
-
     <body class="dark-mode hold-transition layout-top-nav table-bordered">
     <div class="wrapper">
         {#     incluimos la cabecera     #}
@@ -36,6 +34,21 @@
     {% block javascript %}
     
     {% endblock %}
+    <script>
+        {% if messages %}
+            var html = '<p>';
+            {% for message in messages %}
+                html += '{{ message }}<br>';
+            {% endfor %}
+            html += '</p>';
+            Swal.fire({
+                title: 'Error!',
+                html: html,
+                icon: 'error'
+            });
+        {% endif %}
+    </script>
+    </body>
     </body>
 {% endblock %}
 

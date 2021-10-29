@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from ModeloB.forms import VentasForm
+from ModeloB.mixins import ValidatePermissionRequiredMixin
 from ModeloB.models import Sale, Product, DetSale
 
 # librerias para generar factura en pdf
@@ -21,9 +22,10 @@ from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
 
-class VentasListView(ListView):
+class VentasListView(ValidatePermissionRequiredMixin, ListView):
     model = Sale
     template_name = 'ventas/list.html'
+    permission_required = "view_sale"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -36,8 +38,12 @@ class VentasListView(ListView):
             action = request.POST['action']
             if action == 'searchdata':
                 data = []
+                position = 1
                 for i in Sale.objects.all():
-                    data.append(i.toJSON())
+                    item = i.toJSON()
+                    item['position'] = position
+                    data.append(item)
+                    position += 1
             elif action == 'search_details_prod':
                 data = []
                 for i in DetSale.objects.filter(sale_id=request.POST['id']):
@@ -57,14 +63,14 @@ class VentasListView(ListView):
         context['entity'] = 'Ventas'
         return context
 
-
 # Crear un registro
-class VentasCreateView(CreateView):
+class VentasCreateView(ValidatePermissionRequiredMixin, CreateView):
     # se identifica el modelo, el form, la direccion url y el retorno al finalizar.
     model = Sale
     form_class = VentasForm
     template_name = 'ventas/create.html'
     success_url = reverse_lazy('ventas')
+    permission_required = "add_sale"
 
     # decoradores para la seguridad, token y login
     @method_decorator(csrf_exempt)
@@ -127,14 +133,14 @@ class VentasCreateView(CreateView):
         context['det'] = []
         return context
 
-
 # editar un registro
-class VentasUpdateView(UpdateView):
+class VentasUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     # se identifica el modelo, el form, la direccion url y el retorno al finalizar.
     model = Sale
     form_class = VentasForm
     template_name = 'ventas/create.html'
     success_url = reverse_lazy('ventas')
+    permission_required = "change_sale"
 
     # decoradores para la seguridad, token y login
     @method_decorator(csrf_exempt)
@@ -210,12 +216,12 @@ class VentasUpdateView(UpdateView):
         context['det'] = json.dumps(self.get_det_product())
         return context
 
-
 # Eliminar un registro
-class VentasDeleteView(DeleteView):
+class VentasDeleteView(ValidatePermissionRequiredMixin, DeleteView):
     model = Sale
     template_name = 'ventas/delete.html'
     success_url = reverse_lazy('ventas')
+    permission_required = "delete_sale"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -237,7 +243,6 @@ class VentasDeleteView(DeleteView):
         context['entity'] = 'Ventas'
         context['list_url'] = reverse_lazy('ventas')
         return context
-
 
 # clase para generar factura en pdf
 class facturaPDFView(View):

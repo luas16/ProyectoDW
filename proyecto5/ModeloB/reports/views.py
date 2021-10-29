@@ -7,12 +7,14 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
+from ModeloB.mixins import ValidatePermissionRequiredMixin
 from ModeloB.models import Sale
 from ModeloB.reports.forms import ReportForm
 
 
-class ReportSaleView(TemplateView):
+class ReportSaleView(ValidatePermissionRequiredMixin, TemplateView):
     template_name = 'sale/report.html'
+    permission_required = "view_detsale" , "view_sale"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

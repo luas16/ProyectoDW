@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from ModeloB.forms import CategoryForm
+from ModeloB.mixins import ValidatePermissionRequiredMixin
 from ModeloB.models import Category, Client, Product, Sale
 
 
@@ -17,9 +18,10 @@ def category_list(request):
     }
     return render(request, 'category/list.html', data)
 
-class CategoriaListView(ListView):
+class CategoriaListView(ValidatePermissionRequiredMixin, ListView):
     model = Category
     template_name = 'category/list.html'
+    permission_required = "view_category"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -41,11 +43,12 @@ class CategoriaListView(ListView):
         context['create_url'] = reverse_lazy('categoria_create')
         return context
 
-class CategoriaCreateView(CreateView):
+class CategoriaCreateView(ValidatePermissionRequiredMixin, CreateView):
     model = Category
     form_class = CategoryForm
     template_name = 'category/create.html'
     success_url = reverse_lazy('categoria')
+    permission_required = "add_category"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -74,11 +77,12 @@ class CategoriaCreateView(CreateView):
         return context
 
 #Editar un registro
-class CategariaUpdateView(UpdateView):
+class CategariaUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     model = Category
     form_class = CategoryForm
     template_name = 'category/create.html'
     success_url = reverse_lazy('categoria')
+    permission_required = "change_category"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -108,10 +112,11 @@ class CategariaUpdateView(UpdateView):
         return context
 
 #Eliminar un registro
-class CaregoriaDeleteView(DeleteView):
+class CaregoriaDeleteView(ValidatePermissionRequiredMixin, DeleteView):
     model = Category
     template_name = 'category/delete.html'
     success_url = reverse_lazy('categoria')
+    permission_required = "delete_category"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)

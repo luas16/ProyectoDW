@@ -1,6 +1,10 @@
 {% extends 'body.html' %}
 {% load widget_tweaks %}
+{% block head %}
+    {% block head_form %}
 
+    {% endblock %}
+{% endblock %}
 {% block content %}
     <form method="post" action="." enctype="multipart/form-data">
         <div class="card card-default">
@@ -15,7 +19,6 @@
                     {{ title }}
                 </h3>
             </div>
-
             <!-- /.card body -->
             <div class="card-body">
                 {% csrf_token %}
@@ -23,12 +26,10 @@
                 {% for field in form.visible_fields %}
                     <div class="form-group">
                         <label for="">{{ field.label }}</label>
-                        {{ field }}
+                       {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
                     </div>
                 {% endfor %}
             </div>
-
-
             {#  footer del card  #}
             <div class="card-footer">
                 <button type="submit" class="btn btn-primary btn-flat btnTest">

@@ -6,13 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from ModeloB.forms import ClientesForm
+from ModeloB.mixins import ValidatePermissionRequiredMixin
 from ModeloB.models import Client
 
 
 #ver registro
-class ClientesListView(ListView):
+class ClientesListView(ValidatePermissionRequiredMixin, ListView):
     model = Client
     template_name = 'clientes/list.html'
+    permission_required = "view_client"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -35,11 +37,12 @@ class ClientesListView(ListView):
         return context
 
 #Crear un registro
-class ClientesCreateView(CreateView):
+class ClientesCreateView(ValidatePermissionRequiredMixin, CreateView):
     model = Client
     form_class = ClientesForm
     template_name = 'clientes/create.html'
     success_url = reverse_lazy('clientes')
+    permission_required = "add_client"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -68,11 +71,12 @@ class ClientesCreateView(CreateView):
         return context
 
 #Editar un registro
-class ClientesUpdateView(UpdateView):
+class ClientesUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     model = Client
     form_class = ClientesForm
     template_name = 'clientes/create.html'
     success_url = reverse_lazy('clientes')
+    permission_required = "change_client"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)
@@ -102,10 +106,11 @@ class ClientesUpdateView(UpdateView):
         return context
 
 #Eliminar un registro
-class ClientesDeleteView(DeleteView):
+class ClientesDeleteView(ValidatePermissionRequiredMixin, DeleteView):
     model = Client
     template_name = 'clientes/delete.html'
     success_url = reverse_lazy('clientes')
+    permission_required = "delete_client"
 
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)

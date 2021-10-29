@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'ModeloB',
     'ModeloB.login',
+    'ModeloB.user',
     'ModeloB.homepage',
     'ModeloB.reports',
  ]
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'crum.CurrentRequestUserMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -106,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'es-ec'
+LANGUAGE_CODE = 'es-gt'
 
 TIME_ZONE = 'UTC'
 
@@ -132,7 +134,7 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/proyectoDW/principal/'
 
@@ -143,3 +145,7 @@ LOGIN_URL = '/login/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 MEDIA_URL = '/media/'
+
+AUTH_USER_MODEL = 'user.User'
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'

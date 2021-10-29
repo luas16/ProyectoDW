@@ -1,3 +1,5 @@
+from crum import get_current_user
+from django.conf import settings
 from django.db import models
 from datetime import datetime
 
@@ -7,12 +9,34 @@ from ModeloB.choices import gender_choices
 from config.settings import MEDIA_URL, STATIC_URL
 
 
-class Category(models.Model):
+class BaseModel(models.Model):
+    user_creation = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_creation',
+                                      null=True, blank=True)
+    date_creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    user_updated = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_updated',
+                                     null=True, blank=True)
+    date_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseModel):
     name = models.CharField(max_length=150, verbose_name='Nombre', unique=True)
-    desc = models.CharField(max_length=500, null=True, blank= True, verbose_name='Descripción')
+    desc = models.CharField(max_length=500, null=True, blank=True, verbose_name='Descripción')
 
     def __str__(self):
         return self.name
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        user = get_current_user()
+        if user is not None:
+            if not self.pk:
+                self.user_creation = user
+            else:
+                self.user_updated = user
+        super(Category, self).save()
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -55,7 +79,7 @@ class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
     surnames = models.CharField(max_length=150, verbose_name='Apellidos')
     nit = models.CharField(max_length=10, unique=True, verbose_name='NIT')
-    date_birthday= models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
+    date_birthday = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=gender_choices, default='male', verbose_name='Sexo')
 
