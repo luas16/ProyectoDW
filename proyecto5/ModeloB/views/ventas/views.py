@@ -9,9 +9,9 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
-from ModeloB.forms import VentasForm
+from ModeloB.forms import VentasForm, ClientesForm
 from ModeloB.mixins import ValidatePermissionRequiredMixin
-from ModeloB.models import Sale, Product, DetSale
+from ModeloB.models import Sale, Product, DetSale, Client
 
 # librerias para generar factura en pdf
 import os
@@ -89,7 +89,7 @@ class VentasCreateView(ValidatePermissionRequiredMixin, CreateView):
                 prods = Product.objects.filter(name__icontains=request.POST['term'])[0:10]
                 for i in prods:
                     item = i.toJSON()
-                    # item['value'] = i.name #se envian valores par buscar por medio de jquery
+                    # item['value'] = i.names #se envian valores par buscar por medio de jquery
                     item['text'] = i.name  # se envian valores par buscar por medio de select2
                     data.append(item)
             # agregamos productos a la factura y a nuestras tablas
@@ -117,6 +117,21 @@ class VentasCreateView(ValidatePermissionRequiredMixin, CreateView):
                         det.subtotal = float(i['subtotal'])
                         det.save()
                     data = {'id': venta.id}
+            # se se selecciona crear cliente dentro del formulario
+            elif action == 'create_cliente':
+                # se manda toda la informacion captada al fomulario
+                with transaction.atomic():
+                    frmCliente = ClientesForm(request.POST)
+                    data = frmCliente.save()
+            #buscar Clientes
+            elif action == 'search_cliente':
+                data = []
+                clie = Client.objects.filter(names__icontains=request.POST['term'])[0:10]
+                for i in clie:
+                    item = i.toJSON()
+                    # item['value'] = i.names #se envian valores par buscar por medio de jquery
+                    item['text'] = i.names  # se envian valores par buscar por medio de select2
+                    data.append(item)
             else:
                 data['error'] = 'No ha ingresado a ninguna opcion'
         except Exception as e:
@@ -131,6 +146,7 @@ class VentasCreateView(ValidatePermissionRequiredMixin, CreateView):
         context['list_url'] = reverse_lazy('ventas')
         context['action'] = 'add'
         context['det'] = []
+        context['frmCliente'] = ClientesForm
         return context
 
 # editar un registro
@@ -187,6 +203,20 @@ class VentasUpdateView(ValidatePermissionRequiredMixin, UpdateView):
                         det.subtotal = float(i['subtotal'])
                         det.save()
                     data = {'id': venta.id}
+            elif action == 'create_cliente':
+                # se manda toda la informacion captada al fomulario
+                with transaction.atomic():
+                    frmCliente = ClientesForm(request.POST)
+                    data = frmCliente.save()
+            # buscar clientes
+            elif action == 'search_cliente':
+                data = []
+                clie = Client.objects.filter(names__icontains=request.POST['term'])[0:10]
+                for i in clie:
+                    item = i.toJSON()
+                    # item['value'] = i.names #se envian valores par buscar por medio de jquery
+                    item['text'] = i.names  # se envian valores par buscar por medio de select2
+                    data.append(item)
             else:
                 data['error'] = 'No ha ingresado a ninguna opcion'
         except Exception as e:

@@ -2,7 +2,7 @@ from django.forms import *
 from ModeloB.models import *
 from datetime import datetime
 
-
+# formulario categoria
 class CategoryForm(ModelForm):
     # definimos los atributos comunes para los formularios
     def __init__(self, *args, **kwargs):
@@ -44,7 +44,7 @@ class CategoryForm(ModelForm):
             data['error'] = str(e)
         return data
 
-
+# formulario producto
 class ProductForm(ModelForm):
     # definimos los atributos comunes para los formularios
     def __init__(self, *args, **kwargs):
@@ -78,7 +78,7 @@ class ProductForm(ModelForm):
             data['error'] = str(e)
         return data
 
-
+#formulario clientes
 class ClientesForm(ModelForm):
     # definimos los atributos comunes para los formularios
     def __init__(self, *args, **kwargs):
@@ -95,7 +95,17 @@ class ClientesForm(ModelForm):
         widgets = {
             'names': TextInput(
                 attrs={
-                    'placeholder': 'Ingrese un nombre',
+                    'placeholder': 'Ingrese nombres',
+                }
+            ),
+            'surnames': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese  apellidos',
+                }
+            ),
+            'nit': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese el nit del cliente',
                 }
             ),
             'date_birthday': DateInput(
@@ -129,6 +139,7 @@ class ClientesForm(ModelForm):
             data['error'] = str(e)
         return data
 
+#formulario de prueba
 class TestForm(Form):
     categories = ModelChoiceField(queryset=Category.objects.all(), widget=Select(attrs={
         'class': 'form-control select2',
@@ -150,7 +161,7 @@ class TestForm(Form):
         'style': 'width: 100%'
     }))
 
-
+#formulatio de ventas
 class VentasForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -161,7 +172,8 @@ class VentasForm(ModelForm):
         widgets = {
             'cli': Select(attrs={
                 'class': 'form-control select2',
-                'style': 'width: 100%',
+                'id': 'searchCli',
+                # 'style': 'width: 100%',
             }),
             'date_joined': DateInput(
                 format='%Y-%m-%d',

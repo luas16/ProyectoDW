@@ -25,8 +25,8 @@
                 <input type="hidden" name="action" value="{{ action }}">
                 {% for field in form.visible_fields %}
                     <div class="form-group">
-                        <label for="">{{ field.label }}</label>
-                       {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                        <label>{{ field.label }}</label>
+                        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
                     </div>
                 {% endfor %}
             </div>

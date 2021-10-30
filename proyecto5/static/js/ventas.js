@@ -94,7 +94,7 @@ var vents = {
     },
 };
 
-//funcion para mostrar los imagenes en select2
+//funcion para mostrar los datos de los productos en select2
 function formatRepo(repo) {
     //si esta iniciando y esta vacio solo mostrara un texto
     if (repo.loading) {
@@ -126,12 +126,84 @@ $(function () {
         language: 'es',
     });
 
+    //funcion para seleccionar la fecha con date timepicker
     $('#date_joined').datetimepicker({
         format: 'YYYY-MM-DD',
         date: moment().format("YYYY-MM-DD"),
         locale: 'es',
         //minDate: moment().format("YYYY-MM-DD")
     });
+
+    //funcion para seleccionar la fecha con date timepicker
+    $('#date_birthday').datetimepicker({
+        format: 'YYYY-MM-DD',
+        date: moment().format("YYYY-MM-DD"),
+        locale: 'es',
+        //minDate: moment().format("YYYY-MM-DD")
+    });
+
+    //funcion para agregar clientes CON MODAL
+    $('.btnAddCliente').on('click', function () {
+        //llamamos al modal de agg cliente
+        $('#ModalAddCliente').modal('show');
+    });
+
+    //borrar los datos del modal
+    $('#ModalAddCliente').on('hidden.bs.modal', function () {
+        $('#frmCliente').trigger('reset');
+    })
+
+    //AGREGAR CLIENTES POR MEDIO DEL MODAL
+    $('#frmCliente').on('submit', function (e) {
+        e.preventDefault();
+        var parameter = new FormData(this);
+        parameter.append('action', 'create_cliente');
+        //metodo submit para mandar informacion
+        $.confirm({
+            theme: 'material',
+            title: 'Confirmación',
+            icon: 'fa fa-info',
+            content: '¿Esta seguro crear el siguiente cliente',
+            columnClass: 'small',
+            typeAnimated: true,
+            cancelButtonClass: 'btn-primary',
+            draggable: true,
+            dragWindowBorder: false,
+            buttons: {
+                info: {
+                    text: "Si",
+                    btnClass: 'btn-primary',
+                    action: function () {
+                        $.ajax({
+                            url: window.location.pathname,
+                            type: 'POST',
+                            data: parameter,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                        }).done(function (data) {
+                            if (!data.hasOwnProperty('error')) {
+                                $('#ModalAddCliente').modal('hide');
+                                return false;
+                            }
+                            message_error(data.error);
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert(textStatus + ': ' + errorThrown);
+                        }).always(function (data) {
+                        });
+                    }
+                },
+                danger: {
+                    text: "No",
+                    btnClass: 'btn-red',
+                    action: function () {
+
+                    }
+                },
+            }
+        })
+    });
+
     //funcion para descuentos
     $("input[name='descuento']").TouchSpin({
         min: 0,
@@ -146,7 +218,7 @@ $(function () {
     });
 
     // buscar productos
-    // $('input[name="search"]').autocomplete({
+    // $('input[id="search"]').autocomplete({
     //     source: function (request, response) {
     //         $.ajax({
     //             url: window.location.pathname,
@@ -189,8 +261,7 @@ $(function () {
 
     //evento modificar cantidad
     $('#tblProducts tbody')
-        //remover un producto de la factura
-        .on('click', 'a[rel="remove"]', function () {
+        .on('click', 'a[rel="remove"]', function () {         //remover un producto de la factura
             var tr = tblProducts.cell($(this).closest('td, li')).index();
             alerta_eliminacion('Notificación', '¿Esta seguro de eliminar este producto de la factura', function () {
                 vents.items.products.splice(tr.wor, 1);
@@ -210,7 +281,7 @@ $(function () {
         })
 
     //Guardar los datos de la factura
-    $('form').on('submit', function (e) {
+    $('#frmVenta').on('submit', function (e) {
         e.preventDefault();
         if (vents.items.products.length === 0) {
             message_error('Debe de ingresar un producto a la factura para generarla');
@@ -247,7 +318,7 @@ $(function () {
                             if (!data.hasOwnProperty('error')) {
 
                                 alerta_eliminacion('Notificacion', '¿Desea imprimir la boleta de venta?', function () {
-                                    window.open('/proyectoDW/ventas/factura/pdf/'+data.id+'/', '_blank');
+                                    window.open('/proyectoDW/ventas/factura/pdf/' + data.id + '/', '_blank');
                                     location.href = '/proyectoDW/ventas/list/';
                                 }, function () {
                                     location.href = '/proyectoDW/ventas/list/';
@@ -304,7 +375,6 @@ $(function () {
         },
         placeholder: 'Ingrese una descripción',
         minimumInputLength: 1,
-        //propiedad para mostrar la imagen
         templateResult: formatRepo,
     }).on('select2:select', function (e) {
         var data = e.params.data;
@@ -313,6 +383,35 @@ $(function () {
         vents.add(data);
         $(this).val('').trigger('change.select2');
     });
+
+    // buscar clientes
+    $('select[id="searchCli"]').select2({
+        theme: "bootstrap4",
+        language: 'es',
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: window.location.pathname,
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'search_cliente'
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Buscar cliente',
+        minimumInputLength: 1,
+    });
+
+
+
 
 });
 
